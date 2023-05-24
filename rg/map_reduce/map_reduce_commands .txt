@@ -1,0 +1,100 @@
+su - hdp123
+
+#create analyzelogs folder inside home/hdp123...
+sudo mkdir analyzelogs
+
+#give permission to folder...
+sudo chmod -R 777 analyzelogs/
+
+ cd ..
+
+ls
+
+#used to be at root...
+cd
+
+pwd
+
+#giving owership to folder...
+sudo chown -R hdp123 analyzelogs/
+
+#optional command to 
+ls -ltr
+
+#copy java files into analyzelogs folder...
+sudo cp /home/hdp123/Desktop/Assignment_1B/* ~/analyzelogs/
+
+#change directory...
+cd analyzelogs
+
+#optional commands...
+ls
+
+pwd
+
+ls -ltr
+
+ls -al
+
+#giving all files read permissions...
+sudo chmod +r *.*
+
+pwd
+
+#change hadoop version,analyzelogs...
+export CLASSPATH="$HADOOP_HOME/share/hadoop/mapreduce/hadoop-mapreduce-client-core-2.10.1.jar:$HADOOP_HOME/share/hadoop/mapreduce/hadoop-mapreduce-client-common-2.10.1.jar:$HADDOP_HOME/share/hadoop/common/hadoop-common-2.10.1.jar:~/analyzelogs/SalesCountry/*:$HADOOP_HOME/lib/*"
+
+
+export CLASSPATH=`hadoop classpath`:.:
+
+#display classpath...
+echo $CLASSPATH
+
+
+javac -d . SalesMapper.java SalesCountryReducer.java SalesCountryDriver.java
+
+ls
+
+#change directory..
+cd SalesCountry/
+
+ls
+
+cd ..
+
+#edit manifest file...
+sudo nano Manifest.txt
+
+#write in nano editor after that enter key press an ctr+s ctr+x
+Main-class: SalesCountry.SalesCountryDriver
+
+ls
+
+#create jar file..
+jar -cfm analyzelogs.jar Manifest.txt SalesCountry/*.class
+
+ls
+
+cd
+
+start-all.sh
+
+cd analyzelogs/
+
+sudo mkdir ~/input2000
+
+ls
+
+pwd
+
+sudo cp access_log_short.csv ~/input2000/
+
+$HADOOP_HOME/bin/hdfs dfs -put ~/input2000 /
+
+$HADOOP_HOME/bin/hadoop jar analyzelogs.jar /input2000 /output2000
+
+$HADOOP_HOME/bin/hdfs dfs -cat /output2000/part-00000
+
+
+
+

@@ -1,0 +1,86 @@
+CREATE DATABASE flight_info_system;
+
+USE flight_info_system;
+
+CREATE TABLE flight_info (
+  flight_id INT,
+  airline STRING,
+  origin STRING,
+  destination STRING,
+  departure_time STRING,
+  departure_delay INT,
+  arrival_time STRING,
+  arrival_delay INT
+);
+
+ALTER TABLE flight_info ADD COLUMN cancelled BOOLEAN;
+
+ALTER TABLE flight_info RENAME TO flight_info_2023;
+
+CREATE TABLE flight_employee (
+  employee_id INT,
+  position STRING,
+  present BOOLEAN
+);
+
+DROP TABLE flight_employee;
+
+
+
+
+
+CREATE EXTERNAL TABLE flight_info_external (
+  flight_number INT,
+  origin_airport_id INT,
+  origin STRING,
+  destination_airport_id INT,
+  destination STRING,
+  departure_time INT,
+  departure_delay INT,
+  arrival_time INT,
+  arrival_delay INT
+)
+ROW FORMAT DELIMITED
+FIELDS TERMINATED BY ','
+STORED AS TEXTFILE
+LOCATION '/flightdata';
+
+
+
+
+INSERT INTO TABLE flight_info_2023
+SELECT * FROM flight_info_external
+WHERE departure_date LIKE '2008-%';
+
+INSERT INTO TABLE flight_info_2023
+VALUES (100000, 'American Airlines', 'LAX', 'JFK', '10:00', 5, '14:00', 0);
+
+CREATE TABLE airports (
+  airport_code STRING,
+  airport_name STRING,
+  city STRING,
+  state STRING
+);
+
+INSERT INTO TABLE airports
+VALUES ('LAX', 'Los Angeles International Airport', 'Los Angeles', 'CA'),('JFK', 'John F. Kennedy International Airport', 'New York', 'NY');
+
+SELECT fi.flight_id, fi.airline, fi.flight_number, a1.airport_name AS origin_name, a2.airport_name AS destination_name
+FROM flight_info_2023 fi
+JOIN airports a1 ON fi.origin = a1.airport_code
+JOIN airports a2 ON fi.destination = a2.airport_code;
+
+
+
+
+
+
+CREATE INDEX idx_departure_delay ON TABLE flight_info_2023 (departure_delay);
+
+
+
+
+SELECT departure_date, AVG(departure_delay) AS avg_delay
+FROM flight_info_2023
+GROUP BY departure_date;
+
